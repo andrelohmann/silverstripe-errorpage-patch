@@ -7,7 +7,7 @@
 
 ## Requirements
 
-Silverstripe 3.2.*
+Silverstripe 3.3.1
 
 ## Introduction
 
@@ -29,6 +29,8 @@ put the follwoing post install and post updates scripts into your composer.json
             "cp vendor/andrelohmann-silverstripe/framework-errorpage-patch/* -r framework/"
         ]
     },
+
+```
 
 ## Usage
 
