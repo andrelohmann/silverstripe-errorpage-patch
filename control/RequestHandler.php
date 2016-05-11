@@ -469,19 +469,21 @@ class RequestHandler extends ViewableData {
 		$this->extend('onBeforeHTTPError' . $errorCode, $request);
 
 		// Call a handler method such as onBeforeHTTPError, passing 404 as the first arg
-		$this->extend('onBeforeHTTPError', $errorCode, $request);
-		
-		/**
+		$this->extend('onBeforeHTTPError', $errorCode, $request);/**
 		 * @andrelohmann
 		 * 
 		 * This code allows to return custom Error Pages without using the CMS Module
 		 * 
 		 */
 		$template = array('ErrorPage', 'Page');
-		$result = new ArrayData(array(
+		$C = Controller::create();
+		$C->onBeforeInit();
+		$C->init();
+		$C->onAfterInit();
+		$result = $C->customise(new ArrayData(array(
 			'Title' => $errorCode,
 			'Content' => DBField::create_field('HTMLText', $errorMessage)
-		));
+		)));
 
 		// Throw a new exception
 		throw new SS_HTTPResponse_Exception(new SS_HTTPResponse($result->renderWith($template)), $errorCode);
