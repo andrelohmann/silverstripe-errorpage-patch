@@ -393,12 +393,12 @@ class Director implements TemplateGlobalProvider {
 				}
 			}
 		}
-		
+
 		/**
 		 * @andrelohmann
-		 * 
+		 *
 		 * This code allows to return custom Error Pages without using the CMS Module
-		 * 
+		 *
 		 */
 		$template = array('ErrorPage', 'Page');
 		$C = Controller::create();
@@ -418,7 +418,7 @@ class Director implements TemplateGlobalProvider {
 		 *
 		 * // No URL rules matched, so return a 404 error.
 		 * return new SS_HTTPResponse('No URL rule was matched', 404);
-		 * 
+		 *
 		 */
 	}
 
@@ -834,9 +834,13 @@ class Director implements TemplateGlobalProvider {
 	/**
 	 * Skip any further processing and immediately respond with a redirect to the passed URL.
 	 *
-	 * @param string $destURL - The URL to redirect to
+	 * @param string $destURL - The URL to redirect
+	 * @return string URL redirected to if on CLI
 	 */
 	protected static function force_redirect($destURL) {
+		if (static::is_cli()) {
+			return $destURL;
+		}
 		$response = new SS_HTTPResponse();
 		$response->redirect($destURL, 301);
 
@@ -884,7 +888,7 @@ class Director implements TemplateGlobalProvider {
 
 		if($patterns) {
 			// Calling from the command-line?
-			if(!isset($_SERVER['REQUEST_URI'])) return;
+			//if(!isset($_SERVER['REQUEST_URI'])) return; // removed since 3.6.4
 
 			$relativeURL = self::makeRelative(Director::absoluteURL($_SERVER['REQUEST_URI']));
 
@@ -912,11 +916,12 @@ class Director implements TemplateGlobalProvider {
 			$destURL = str_replace('http:', 'https:', Director::absoluteURL($url));
 
 			// This coupling to SapphireTest is necessary to test the destination URL and to not interfere with tests
-			if(class_exists('SapphireTest', false) && SapphireTest::is_running_test()) {
-				return $destURL;
-			} else {
-				self::force_redirect($destURL);
-			}
+			//if(class_exists('SapphireTest', false) && SapphireTest::is_running_test()) {
+			//	return $destURL;
+			//} else {
+			//	self::force_redirect($destURL);
+			//} // removed since 3.6.4
+			return self::force_redirect($destURL);
 		} else {
 			return false;
 		}
