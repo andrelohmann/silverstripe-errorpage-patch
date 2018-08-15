@@ -222,7 +222,7 @@ class Director implements TemplateGlobalProvider {
 
 		// These are needed so that calling Director::test() doesnt muck with whoever is calling it.
 		// Really, it's some inappropriate coupling and should be resolved by making less use of statics
-		$oldStage = Versioned::current_stage();
+		$oldMode = Versioned::get_reading_mode();
 		$getVars = array();
 
 		if(!$httpMethod) $httpMethod = ($postVars || is_array($postVars)) ? "POST" : "GET";
@@ -262,7 +262,7 @@ class Director implements TemplateGlobalProvider {
 
 			// These are needed so that calling Director::test() doesnt muck with whoever is calling it.
 			// Really, it's some inappropriate coupling and should be resolved by making less use of statics
-			Versioned::reading_stage($oldStage);
+			Versioned::set_reading_mode($oldMode);
 
 			Injector::unnest(); // Restore old CookieJar, etc
 			Config::unnest();
@@ -386,7 +386,14 @@ class Director implements TemplateGlobalProvider {
 					} catch(SS_HTTPResponse_Exception $responseException) {
 						$result = $responseException->getResponse();
 					}
-					if(!is_object($result) || $result instanceof SS_HTTPResponse) return $result;
+					// Ensure cache headers are added
+					if ($result instanceof SS_HTTPResponse) {
+						HTTP::add_cache_headers($result);
+						return $result;
+					}
+					if(!is_object($result)) {
+						return $result;
+					}
 
 					user_error("Bad result from url " . $request->getURL() . " handled by " .
 						get_class($controllerObj)." controller: ".get_class($result), E_USER_WARNING);

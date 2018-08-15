@@ -36,6 +36,14 @@
 class RequestHandler extends ViewableData {
 
 	/**
+   * Optional url_segment for this request handler
+   *
+   * @config
+   * @var string|null
+   */
+  private static $url_segment = null;
+
+	/**
 	 * @var SS_HTTPRequest $request The request object that the controller was called with.
 	 * Set in {@link handleRequest()}. Useful to generate the {}
 	 */
@@ -422,7 +430,7 @@ class RequestHandler extends ViewableData {
 				$isAllowed = true;
 			} elseif(substr($test, 0, 2) == '->') {
 				// Determined by custom method with "->" prefix
-				list($method, $arguments) = Object::parse_class_spec(substr($test, 2));
+				list($method, $arguments) = SS_Object::parse_class_spec(substr($test, 2));
 				$isAllowed = call_user_func_array(array($this, $method), $arguments);
 			} else {
 				// Value is a permission code to check the current member against
@@ -471,9 +479,9 @@ class RequestHandler extends ViewableData {
 		// Call a handler method such as onBeforeHTTPError, passing 404 as the first arg
 		$this->extend('onBeforeHTTPError', $errorCode, $request);/**
 		 * @andrelohmann
-		 * 
+		 *
 		 * This code allows to return custom Error Pages without using the CMS Module
-		 * 
+		 *
 		 */
 		$template = array('ErrorPage', 'Page');
 		$C = Controller::create();
@@ -494,7 +502,7 @@ class RequestHandler extends ViewableData {
 		 *
 		 * // Throw a new exception
 		 * throw new SS_HTTPResponse_Exception($errorMessage, $errorCode);
-		 * 
+		 *
 		 */
 	}
 
@@ -518,5 +526,21 @@ class RequestHandler extends ViewableData {
 	 */
 	public function setRequest($request) {
 		$this->request = $request;
+	}
+
+	/**
+	 * Returns a link to this controller.  Overload with your own Link rules if they exist.
+	 *
+	 * @param string $action Optional action (soft-supported via func_get_args)
+	 * @return string
+	 */
+	public function Link() {
+		$action = func_num_args() ? func_get_arg(0) : null;
+		$urlSegment = $this->config()->get('url_segment') ?: get_class($this);
+		$link = Controller::join_links($urlSegment, $action, '/');
+
+		// Give extensions the chance to modify by reference
+		$this->extend('updateLink', $link);
+		return $link;
 	}
 }

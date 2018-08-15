@@ -7,7 +7,7 @@
 
 ## Requirements
 
-Silverstripe 3.6.*
+Silverstripe 3.7.*
 
 ## Introduction
 
@@ -42,4 +42,3 @@ create following files:
 ```
 
 These Files will build your custom Error Page
-
