@@ -248,7 +248,7 @@ class Director implements TemplateGlobalProvider {
 		// Set callback to invoke prior to return
 		$onCleanup = function() use(
 			$existingRequestVars, $existingGetVars, $existingPostVars, $existingSessionVars,
-			$existingCookies, $existingServer, $existingRequirementsBackend, $oldStage
+			$existingCookies, $existingServer, $existingRequirementsBackend, $oldMode
 		) {
 			// Restore the superglobals
 			$_REQUEST = $existingRequestVars;
